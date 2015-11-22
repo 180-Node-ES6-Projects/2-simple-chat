@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+	<head>
+		<title>2 Simple chat</title>
+		<script src="http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js"></script>
+	</head>
+	<body>
+		<div id="error" style="display:none;">
+			<h1>Please enter your name</h1>
+		</div>
+		<div id="chat">
+			<h1>Simple Chat</h1>
+		</div>
+		<hr>
+		<div id="inp">
+			<form id="cform">
+				Nick: <input type="text" autocomplete="off" id="nick">
+				Message: <input type="text" autocomplete="off" id="message">
+				<input type="submit" value="Send Message">
+			</form>
+		</div>
+		<script>
+			var sockjs_url = '/chat';
+			var sockjs = new SockJS(sockjs_url);
+			var form = document.getElementById('cform');
+			var nick = document.getElementById('nick');
+			var message = document.getElementById('message');
+			var err_div = document.getElementById('error');
+			form.onsubmit = function(e){
+				e.preventDefault();
+				if(nick.value !== ''){
+					var msg = nick.value + ' : ' + message.value;					
+					sockjs.send(msg);
+					message.value = '';
+				}else{
+					err_div.style.display = 'block';
+					setTimeout(function(){
+						err_div.style.display = 'none';
+					},5000);
+				}
+				return false;
+			}
+
+			var print = function(m){
+				var text_area = document.getElementById('chat');
+				var msg = document.createTextNode(m);
+				var new_div = document.createElement('div');
+				new_div.appendChild(msg);
+				text_area.appendChild(new_div);
+			}
+			sockjs.onmessage = function(e){
+				print(e.data);
+			}
+		</script>
+	</body>
+</html>
