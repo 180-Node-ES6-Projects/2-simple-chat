@@ -5,13 +5,25 @@ let sockjs_opts = {sockjs_url: "http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.
 
 let connections = [];
 let chat_server = sockjs.createServer(sockjs_opts);
-
+const push = (list,item) => {
+	return [
+		...list,
+		item
+	];
+}
+const removeFromList = (list,idx) => {
+	return [
+		...list.slice(0,idx),
+		...list.slice(idx+1)
+	]
+	
+}
 chat_server.on('connection',(conn)=>{
-	connections.push(conn);
+	connections = push(connections,conn);
 	conn.write("SERVER: Welcome to the chat. Please enter your name.");
 	conn.on('close', ()=>{
 		let idx = connections.indexOf(conn);
-		connections = connections.splice(idx,1);
+		connections = removeFromList(connections,idx);
 	});
 	conn.on('data',(message)=>{
 		connections.forEach((c)=>{
